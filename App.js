@@ -28,10 +28,13 @@ export default function App() {
     return <Text>No access to camera</Text>;
   }
 
+  // run this when successfully scanned a qr code
   const handleBarCodeScanned = ({ type, data }) => {
     const url = data;
     if (!(url in urls)) getHTML(url);
   }
+
+  // add one row, the state is readonly, have to copy and setState
   const updateArr = (url, obj) => {
     let newUrls = Object.assign({}, urls); // shallow copy
     let newArr = [...arr];
@@ -43,39 +46,42 @@ export default function App() {
     }
   }
 
+  // input table colume name, output corresponding data
   const tabelData = (html, colName) => {
+    // we got: <th>colName</th><td>number</td>, we want: number
     const re = new RegExp(`${colName}<[^>]*>[^<]*<[^>]*>([^<]*)<`);
     const match = html.match(re);
     if (match && match[1]) return match[1];
     return undefined;
   }
 
+  // get data from html text
   const parseHTML = (url, html) => {
     var obj = {}
     colNames.forEach((colName) => {
       if (colName !== 'Color Code') obj[colName] = tabelData(html, colName)
       else obj[colName] = tabelData(html, '顏色編號')
     })
-    console.log(JSON.stringify(obj));
+    // console.log(JSON.stringify(obj));
     if (obj && Object.keys(obj).length !== 0)
       updateArr(url, obj);
   }
 
+  // get html from url
   const getHTML = (url) => {
     console.log(url);
     fetch(url, { headers: { 'Accept-Language': 'en-US,en;q=0.5' } }).then((data) => {
       if (data.status === 200) {
-        // console.log(data);
         data.text().then(
           (html) => {
-            html = html.replace(/<\s*br\s*>/g, ' ');
-            parseHTML(url, html);
+            html = html.replace(/<\s*br\s*>/g, ' ');  // remove newline (<br>)
+            parseHTML(url, html);                     // get data from html text
           }
         ).catch((error) => { console.log('Error: 1', error); });
       }
     }).catch((error) => { console.log('Error: 2', error); });
   }
-
+  // TODO
   const toXLS = async (url) => {
     var ws = XLSX.utils.json_to_sheet(arr);
     var wb = XLSX.utils.book_new();
@@ -89,14 +95,12 @@ export default function App() {
     await FileSystem.writeAsStringAsync(uri, wbout, {
       encoding: FileSystem.EncodingType.Base64
     });
-
     await Sharing.shareAsync(uri, {
       mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       dialogTitle: 'MyWater data',
       UTI: 'com.microsoft.excel.xlsx'
     });
   }
-
 
   return (
     <View style={styles.container}>
@@ -119,6 +123,7 @@ export default function App() {
         </Table>
       </ScrollView>
       <View style={{ margin: 20, }}>
+        {/* TODO */}
         <Button onPress={undefined} color="#FA8072" title="download" />
       </View>
     </View>
