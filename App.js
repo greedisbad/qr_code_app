@@ -63,7 +63,7 @@ export default function App() {
       else obj[colName] = tabelData(html, '顏色編號')
     })
     // console.log(JSON.stringify(obj));
-    if (obj && Object.keys(obj).length !== 0)
+    if (obj && typeof obj['Coil No.'] !== 'undefined')
       updateArr(url, obj);
   }
 
@@ -82,7 +82,7 @@ export default function App() {
     }).catch((error) => { console.log('Error: 2', error); });
   }
   // TODO
-  const toXLS = async (url) => {
+  const toXLS = async () => {
     var ws = XLSX.utils.json_to_sheet(arr);
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "coil");
@@ -91,7 +91,6 @@ export default function App() {
       bookType: "xlsx"
     });
     const uri = FileSystem.cacheDirectory + 'coil.xlsx';
-    console.log(`Writing to ${JSON.stringify(uri)} with text: ${wbout}`);
     await FileSystem.writeAsStringAsync(uri, wbout, {
       encoding: FileSystem.EncodingType.Base64
     });
@@ -124,7 +123,7 @@ export default function App() {
       </ScrollView>
       <View style={{ margin: 20, }}>
         {/* TODO */}
-        <Button onPress={undefined} color="#FA8072" title="download" />
+        <Button onPress={toXLS} color="#FA8072" title="download" />
       </View>
     </View>
   );

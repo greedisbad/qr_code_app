@@ -25,5 +25,8 @@
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "repository": "git@github.com:greedisbad/qr_code_app.git",
+  "author": "greedisbad <997274055@qq.com>",
+  "license": "MIT"
 }
